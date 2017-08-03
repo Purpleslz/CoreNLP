@@ -63,6 +63,7 @@ public class MentionAnnotator extends TextAnnotationCreator implements Annotator
       //System.out.println("got head finder");
       md = getMentionFinder(props, headFinder);
       log.info("Using mention detector type: "+mdName);
+      log.info("incoming!!");
       mentionAnnotatorRequirements.addAll(Arrays.asList(
           CoreAnnotations.TokensAnnotation.class,
           CoreAnnotations.SentencesAnnotation.class,
@@ -75,6 +76,7 @@ public class MentionAnnotator extends TextAnnotationCreator implements Annotator
           SemanticGraphCoreAnnotations.EnhancedDependenciesAnnotation.class
 
       ));
+      log.info("oh shit!!");
     } catch (Exception e) {
       e.printStackTrace();
       log.info("Error with building coref mention annotator!");

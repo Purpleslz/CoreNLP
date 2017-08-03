@@ -103,6 +103,10 @@ public class CorefSystem {
       }
     }).run(docMaker);
 
+    writerGold.close();
+    writerBeforeCoref.close();
+    writerAfterCoref.close();
+
     Logger logger = Logger.getLogger(CorefSystem.class.getName());
     String summary = CorefScorer.getEvalSummary(CorefProperties.getScorerPath(props),
         goldOutput, beforeCorefOutput);
@@ -111,10 +115,6 @@ public class CorefSystem {
         afterCorefOutput);
     CorefScorer.printScoreSummary(summary, logger, true);
     CorefScorer.printFinalConllScore(summary);
-
-    writerGold.close();
-    writerBeforeCoref.close();
-    writerAfterCoref.close();
   }
 
   public static void main(String[] args) throws Exception {

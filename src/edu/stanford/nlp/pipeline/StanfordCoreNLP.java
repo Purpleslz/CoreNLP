@@ -491,6 +491,7 @@ public class StanfordCoreNLP extends AnnotationPipeline  {
       this.addAnnotator(an);
 
       if (enforceRequirements) {
+          System.out.println("require!!!");
         Set<Class<? extends CoreAnnotation>> allRequirements = an.requires();
         for (Class<? extends CoreAnnotation> requirement : allRequirements) {
           if (!requirementsSatisfied.contains(requirement)) {
@@ -645,7 +646,9 @@ public class StanfordCoreNLP extends AnnotationPipeline  {
   /** {@inheritDoc} */
   @Override
   public void annotate(Annotation annotation) {
+    //logger.info("annotate");
     super.annotate(annotation);
+    //logger.info("annotated!!!");
     List<CoreLabel> words = annotation.get(CoreAnnotations.TokensAnnotation.class);
     if (words != null) {
       numWords += words.size();

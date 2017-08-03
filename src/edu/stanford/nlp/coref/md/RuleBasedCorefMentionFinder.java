@@ -1,6 +1,9 @@
 
 package edu.stanford.nlp.coref.md;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -28,7 +31,8 @@ import edu.stanford.nlp.util.IntPair;
 public class RuleBasedCorefMentionFinder extends CorefMentionFinder {
 
   public RuleBasedCorefMentionFinder(HeadFinder headFinder, Properties props) {
-    this(true, headFinder, CorefProperties.getLanguage(props));
+    //this(true, headFinder, CorefProperties.getLanguage(props));
+    this(false, headFinder, CorefProperties.getLanguage(props));
   }
 
   public RuleBasedCorefMentionFinder(boolean allowReparsing, HeadFinder headFinder, Locale lang) {
@@ -101,6 +105,27 @@ public class RuleBasedCorefMentionFinder extends CorefMentionFinder {
       setBarePlural(predictedMentions.get(i));
     }
 
+    // append all mentions to the file
+    try{
+
+    BufferedWriter bw = new BufferedWriter(new FileWriter("./logs/all.txt", true));
+    bw.write("#begin document\n");
+    for(int i=0 ; i < predictedMentions.size() ; i++) {
+        List<Mention> mentions = predictedMentions.get(i);
+
+        for (Mention m : mentions)
+        {
+            bw.write("index: " + i + " " + m.startIndex + " " + m.endIndex + "\n");
+            bw.write("text: " + m.toString() + "\n");
+        }
+    }
+    bw.write("#end document\n");
+    bw.close();
+    }catch(IOException e)
+    {
+        e.printStackTrace();
+    }
+
     // mention selection based on document-wise info
     if (lang == Locale.ENGLISH && !CorefProperties.liberalMD(props)) {
       removeSpuriousMentionsEn(doc, predictedMentions, dict);
@@ -142,12 +167,17 @@ public class RuleBasedCorefMentionFinder extends CorefMentionFinder {
       int endIdx = ((CoreLabel)mLeaves.get(mLeaves.size()-1).label()).get(CoreAnnotations.IndexAnnotation.class);
       //if (",".equals(sent.get(endIdx-1).word())) { endIdx--; } // try not to have span that ends with ,
       IntPair mSpan = new IntPair(beginIdx, endIdx);
+      //System.out.println("candidate Mention: " + beginIdx + " " + endIdx);
+      //if(!mentionSpanSet.contains(mSpan) && ( lang==Locale.CHINESE || !insideNE(mSpan, namedEntitySpanSet)) ) {
       if(!mentionSpanSet.contains(mSpan) && ( lang==Locale.CHINESE || !insideNE(mSpan, namedEntitySpanSet)) ) {
 //      if(!mentionSpanSet.contains(mSpan) && (!insideNE(mSpan, namedEntitySpanSet) || t.value().startsWith("PRP")) ) {
         int dummyMentionId = -1;
         Mention m = new Mention(dummyMentionId, beginIdx, endIdx, sent, basicDependency, enhancedDependency, new ArrayList<>(sent.subList(beginIdx, endIdx)), t);
         mentions.add(m);
         mentionSpanSet.add(mSpan);
+
+        //System.out.println("NP Mention: " + beginIdx + " " + endIdx);
+        //System.out.println(m.toString());
 
 //        if(m.originalSpan.size() > 1) {
 //          boolean isNE = true;
@@ -232,6 +262,36 @@ public class RuleBasedCorefMentionFinder extends CorefMentionFinder {
     Set<String> standAlones = new HashSet<>();
     List<CoreMap> sentences = doc.get(CoreAnnotations.SentencesAnnotation.class);
 
+    // append removed mention to file
+    try{
+        BufferedWriter bw1 = new BufferedWriter(new FileWriter("./logs/pleonastic.txt", true));
+        BufferedWriter bw2 = new BufferedWriter(new FileWriter("./logs/nonword.txt", true));
+        BufferedWriter bw3 = new BufferedWriter(new FileWriter("./logs/quantrule.txt", true));
+        BufferedWriter bw4 = new BufferedWriter(new FileWriter("./logs/partitiveRule.txt", true));
+        BufferedWriter bw5 = new BufferedWriter(new FileWriter("./logs/bareNPRule.txt", true));
+        BufferedWriter bw6 = new BufferedWriter(new FileWriter("./logs/percentsymbol.txt", true));
+        BufferedWriter bw7 = new BufferedWriter(new FileWriter("./logs/percentandmoney.txt", true));
+        BufferedWriter bw8 = new BufferedWriter(new FileWriter("./logs/isAdjectival.txt", true));
+        BufferedWriter bw9 = new BufferedWriter(new FileWriter("./logs/stoplist.txt", true));
+        BufferedWriter bw0 = new BufferedWriter(new FileWriter("./logs/nested.txt", true));
+        
+        bw1.write("#begin document\n");
+        bw2.write("#begin document\n");
+        bw3.write("#begin document\n");
+        bw4.write("#begin document\n");
+        bw5.write("#begin document\n");
+        bw6.write("#begin document\n");
+        bw7.write("#begin document\n");
+        bw8.write("#begin document\n");
+        bw9.write("#begin document\n");
+        bw0.write("#begin document\n");
+    //}catch(IOException e)
+    //{
+        //e.printStackTrace();
+    //}
+
+
+
     for(int i=0 ; i < predictedMentions.size() ; i++) {
       CoreMap s = sentences.get(i);
       List<Mention> mentions = predictedMentions.get(i);
@@ -246,16 +306,44 @@ public class RuleBasedCorefMentionFinder extends CorefMentionFinder {
         // pleonastic it
         if(isPleonastic(m, tree)) {
           remove.add(m);
+          //try{
+        bw1.write("index: " + i + " " + m.startIndex + " " + m.endIndex + "\n");
+        bw1.write("text: " + m.toString() + "\n");
+//
+        //}catch(IOException e)
+          //{
+              //e.printStackTrace();
+          //}
         }
 
         // non word such as 'hmm'
-        if(dict.nonWords.contains(m.headString)) remove.add(m);
+        if(dict.nonWords.contains(m.headString)) 
+        {
+            //try{
+
+        bw2.write("index: " + i + " " + m.startIndex + " " + m.endIndex + "\n");
+        bw2.write("text: " + m.toString() + "\n");
+            //}catch (IOException e)
+            //{
+                //e.printStackTrace();
+            //}
+
+        remove.add(m);
+        }
 
         // quantRule : not starts with 'any', 'all' etc
         if (m.originalSpan.size() > 0) {
           String firstWord = m.originalSpan.get(0).get(CoreAnnotations.TextAnnotation.class).toLowerCase(Locale.ENGLISH);
           if(firstWord.matches("none|no|nothing|not")) {
             remove.add(m);
+            //try{
+
+        bw3.write("index: " + i + " " + m.startIndex + " " + m.endIndex + "\n");
+        bw3.write("text: " + m.toString() + "\n");
+            //}catch(IOException e)
+            //{
+                //e.printStackTrace();
+            //}
           }
 //          if(dict.quantifiers.contains(firstWord)) remove.add(m);
         }
@@ -263,12 +351,28 @@ public class RuleBasedCorefMentionFinder extends CorefMentionFinder {
         // partitiveRule
         if (partitiveRule(m, sent, dict)) {
           remove.add(m);
+          //try{
+
+        bw4.write("index: " + i + " " + m.startIndex + " " + m.endIndex + "\n");
+        bw4.write("text: " + m.toString() + "\n");
+          //}catch(IOException e)
+          //{
+              //e.printStackTrace();
+          //}
         }
 
         // bareNPRule
         if (headPOS.equals("NN") && !dict.temporals.contains(m.headString)
             && (m.originalSpan.size()==1 || m.originalSpan.get(0).get(CoreAnnotations.PartOfSpeechAnnotation.class).equals("JJ"))) {
           remove.add(m);
+          //try{
+
+        bw5.write("index: " + i + " " + m.startIndex + " " + m.endIndex + "\n");
+        bw5.write("text: " + m.toString() + "\n");
+          //}catch(IOException e)
+          //{
+              //e.printStackTrace();
+          //}
         }
 
         // remove generic rule
@@ -276,9 +380,25 @@ public class RuleBasedCorefMentionFinder extends CorefMentionFinder {
 
         if (m.headString.equals("%")) {
           remove.add(m);
+          //try{
+
+        bw6.write("index: " + i + " " + m.startIndex + " " + m.endIndex + "\n");
+        bw6.write("text: " + m.toString() + "\n");
+          //}catch(IOException e)
+          //{
+              //e.printStackTrace();
+          //}
         }
         if (headNE.equals("PERCENT") || headNE.equals("MONEY")) {
           remove.add(m);
+          //try{
+
+        bw7.write("index: " + i + " " + m.startIndex + " " + m.endIndex + "\n");
+        bw7.write("text: " + m.toString() + "\n");
+          //}catch(IOException e)
+          //{
+              //e.printStackTrace();
+          //}
         }
 
         // adjective form of nations
@@ -287,10 +407,30 @@ public class RuleBasedCorefMentionFinder extends CorefMentionFinder {
         // check if the mention is noun and the next word is not noun
         if (dict.isAdjectivalDemonym(m.spanToString())) {
           remove.add(m);
+          //try{
+
+        bw8.write("index: " + i + " " + m.startIndex + " " + m.endIndex + "\n");
+        bw8.write("text: " + m.toString() + "\n");
+          //}catch(IOException e)
+          //{
+              //e.printStackTrace();
+          //}
         }
 
         // stop list (e.g., U.S., there)
-        if (inStopList(m)) remove.add(m);
+        if (inStopList(m)) 
+        {
+
+        remove.add(m);
+        //try{
+
+        bw9.write("index: " + i + " " + m.startIndex + " " + m.endIndex + "\n");
+        bw9.write("text: " + m.toString() + "\n");
+        //}catch(IOException e)
+        //{
+            //e.printStackTrace();
+        //}
+        }
       }
 
       // nested mention with shared headword (except apposition, enumeration): pick larger one
@@ -303,10 +443,46 @@ public class RuleBasedCorefMentionFinder extends CorefMentionFinder {
               continue;
             }
             remove.add(m2);
+            //try{
+
+            bw0.write("index: " + i + " " + m1.startIndex + " " + m1.endIndex + " " + i + " " + m2.startIndex + " " + m2.endIndex + "\n");
+            bw0.write("text: " + m1.toString() + "|" + m2.toString() + "\n");
+            //}catch(IOException e)
+            //{
+                //e.printStackTrace();
+            //}
           }
         }
       }
       mentions.removeAll(remove);
+    }
+
+    //try{
+
+    bw1.write("#end document\n");
+    bw2.write("#end document\n");
+    bw3.write("#end document\n");
+    bw4.write("#end document\n");
+    bw5.write("#end document\n");
+    bw6.write("#end document\n");
+    bw7.write("#end document\n");
+    bw8.write("#end document\n");
+    bw9.write("#end document\n");
+    bw0.write("#end document\n");
+
+    bw1.close();
+    bw2.close();
+    bw3.close();
+    bw4.close();
+    bw5.close();
+    bw6.close();
+    bw7.close();
+    bw8.close();
+    bw9.close();
+    bw0.close();
+    }catch(IOException e)
+    {
+        e.printStackTrace();
     }
   }
 }

@@ -56,6 +56,7 @@ public class DocumentMaker {
     if (!PropertiesUtils.getBool(props,"coref.printConLLLoadingMessage",true))
       options.printConLLLoadingMessage = false;
     options.annotateTokenCoref = false;
+    //String conllFileFilter = props.getProperty("coref.conllFileFilter", ".*_auto_conll$");
     String conllFileFilter = props.getProperty("coref.conllFileFilter", ".*_auto_conll$");
     options.setFilter(conllFileFilter);
     options.lang = CorefProperties.getLanguage(props);
@@ -69,8 +70,7 @@ public class DocumentMaker {
     else {
       throw new RuntimeException("Invalid language setting: cannot load HeadFinder");
     }
-  }
-
+  } 
   public Document makeDocument(Annotation anno) throws Exception {
     return makeDocument(new InputDoc(anno, null, null));
   }
@@ -135,6 +135,8 @@ public class DocumentMaker {
     if (input == null) {
       return null;
     }
+        
+    System.out.println("nextdoc!!!");
 
     if (!CorefProperties.useConstituencyParse(props)) {
       for (CoreMap sentence : input.annotation.get(CoreAnnotations.SentencesAnnotation.class)) {
