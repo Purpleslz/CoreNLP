@@ -73,9 +73,9 @@ public class QuestionToStatementTranslatorITest {
 
   private void check(String input, String output) {
     List<List<CoreLabel>> results = instance.toStatement(parseSentence(input));
-    assertTrue(input,results.size() > 0);
-    assertEquals(output,
-        StringUtils.join(results.get(0).stream().map(CoreLabel::word), " "));
+    assertTrue("should have gotten a result for hte translation for: " + input,results.size() > 0);
+    String got = StringUtils.join(results.get(0).stream().map(CoreLabel::word), " ");
+    assertEquals(output, got);
   }
 
   private void checkFormatted(String input, String output) {
@@ -88,6 +88,18 @@ public class QuestionToStatementTranslatorITest {
 
   @Test
   public void parseWhatIs() {
+    check(
+        "what/WP is/VBZ it/PRP trying/VNG to/TO do/VB ?",
+        "it is trying to thing");
+    check(
+        "what/WP is/VBZ it/PRP made/VBN of/IN ?",
+        "it is made of thing");
+    check(
+        "what/WP is/VBZ that/PRP made/VBN of/IN ?",
+        "that is made of thing");
+    check(
+        "what/WP is/VBZ the/DT dress/NN made/VBN of/IN ?",
+        "the dress is made of thing");
     check(
         "what/WP was/VBD the/DT country/NN Tesla/NNP was/VBD born/VBN in/IN ?",
         "the country Tesla was born in was thing");
@@ -273,6 +285,9 @@ public class QuestionToStatementTranslatorITest {
   @Test
   public void parseWhatDoVP() {
     check(
+        "what/WP does/VBZ UNICEF/NNP do/VB ?",
+        "UNICEF does thing");
+    check(
         "what/WP kind/JJ of/IN economy/NN does/VB china/NNP have/VBZ ?",
         "china have kind of economy");
     check(
@@ -326,6 +341,15 @@ public class QuestionToStatementTranslatorITest {
 
   @Test
   public void parseWhereDoes() {
+    check(
+        "where/WRB does/VB money/NN go/VB ?",
+        "money go to location");
+    check(
+        "where/WRB do/VB pandas/NN sleep/VB ?",
+        "pandas sleep at location");
+    check(
+        "where/WRB do/VB pandas/NN go/VB to/TO sleep/VB ?",
+        "pandas go to sleep at location");
     check(
         "where/WRB does/VB lani/NNP river/NNP begin/VB and/CC end/VB ?",
         "lani river begin and end at location");
@@ -552,6 +576,28 @@ public class QuestionToStatementTranslatorITest {
     check(
         "what/WDT currency/NN does/VBZ the/DT USA/NNP use/VB ?",
         "the USA use currency");
+  }
+
+
+  @Test
+  public void parseWhatNNIs() {
+    check(
+        "what/WDT kind/NN of/IN cotton/NN is/VB it/PRP made/VBN of/IN ?",
+        "it is made of kind of cotton");
+  }
+
+
+  @Test
+  public void parseHow() {
+    check(
+        "how/WRB do/VBP these/DT questions/NNS make/VBP you/PRP feel/VP ?",
+        "these questions make you feel way");
+    check(
+        "how/WRB do/VBP I/DT ship/VB my/PRP$ package/NN ?",
+        "I ship my package way");
+    check(
+        "how/WRB big/JJ is/VBZ Texas/NNP ?",
+        "Texas is adjective");
   }
 
 
