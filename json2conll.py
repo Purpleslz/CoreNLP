@@ -147,9 +147,9 @@ def mention_str(m_begin, m_end, m_begin_end, sent_index, token_index):
                 ret = ''.join((ret, '(', entity_name, ')'))
 
     # the end of a mention only add one ) after it
-    if sent_index in m_begin:
-        if token_index in m_begin[sent_index]:
-            for entity_name in m_begin[sent_index][token_index]:
+    if sent_index in m_end:
+        if token_index in m_end[sent_index]:
+            for entity_name in m_end[sent_index][token_index]:
                 if ret:
                     ret = ''.join((ret, '|'))
                 ret = ''.join((ret, entity_name, ')'))
