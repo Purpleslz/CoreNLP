@@ -159,7 +159,7 @@ def mention_str(m_begin, m_end, m_begin_end, sent_index, token_index):
         ret = '-'
     return ret
 
-def convert(doc_json, fo):
+def convert(doc_json, fo, nomention=False):
     """
         Arguments:
             doc_json: content in json format
@@ -309,7 +309,10 @@ def convert(doc_json, fo):
                 column.append(token["ner"])
             # Column 12: N Predicate Arguments
             #            N Coreference
-            column.append(mention_str(m_begin, m_end, m_begin_end, sent_index, token_index))
+            if nomention:
+                column.append('-')
+            else:
+                column.append(mention_str(m_begin, m_end, m_begin_end, sent_index, token_index))
 
             # write to file
             fo.write('\t'.join(column))
@@ -328,18 +331,31 @@ if __name__ == "__main__":
     try:
         json_file = sys.argv[1]
     except IndexError:
-        print("USAGE: python {} json_file [target_file]".format(sys.argv[0]))
+        # print("USAGE: python {} json_file [target_file] [nomention]".format(sys.argv[0]))
+        print("USAGE: python {} json_file [nomention]".format(sys.argv[0]))
         print("target_file is json_file's name + .conll by default")
         exit(1)
+    
+    target_file = '.'.join((json_file, 'conll'))
+
+    # try:
+        # target_file = sys.argv[2]
+    # except IndexError:
+        # target_file = '.'.join((json_file, 'conll'))
+
+    nomention = False
 
     try:
-        target_file = sys.argv[2]
+        temp = sys.argv[2]
+        if temp == "nomention":
+            nomention = True
     except IndexError:
-        target_file = ''.join((json_file, '.conll'))
-        print("target_file =", target_file)
+        # do nothing
+        pass
+        
 
     with open(json_file, 'r') as jsonf:
         js = json.load(jsonf)
 
     with open(target_file, 'w') as f:
-        convert(js, f)
+        convert(js, f, nomention)

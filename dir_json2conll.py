@@ -32,9 +32,18 @@ if __name__ == "__main__":
     try:
         json_dir = sys.argv[1]
     except IndexError:
-        print("USAGE: python {} json_dir".format(sys.argv[0]))
+        print("USAGE: python {} json_dir [nomention]".format(sys.argv[0]))
         print("conll file will be created in the same direcory, filename = json_file + '.conll'")
         exit(1)
+
+    nomention = False
+    try:
+        temp = sys.argv[2]
+        if temp == "nomention":
+            nomention = True
+    except IndexError:
+        # do nothing
+        pass
 
     for root, dirs, files in os.walk(json_dir):
         for json_file_name in files:
@@ -45,4 +54,4 @@ if __name__ == "__main__":
                     js = json.load(jsonf)
 
                 with open(target_file, 'w') as f:
-                    convert(js, f)
+                    convert(js, f, nomention)
