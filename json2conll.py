@@ -248,7 +248,8 @@ def convert(doc_json, fo, nomention=False):
 
     # doc id = file name
     # part number = 0 fixed
-    docid = doc_json["docId"]
+    # docid = doc_json["docId"]
+    docid = "bn/cnn/01/cnn_0159"
     partnb = "000"
 
     # begin of document
@@ -283,14 +284,15 @@ def convert(doc_json, fo, nomention=False):
             else:
                 column.append("-")
             # Column  7: Predicate lemma
-            if token["lemma"]:
-                # display lemma only when it is different with word
-                if token["lemma"] != token["word"]:
-                    column.append(token["lemma"])
-                else:
-                    column.append("-")
-            else:
-                column.append("-")
+#            if token["lemma"]:
+#                # display lemma only when it is different with word
+#                if token["lemma"] != token["word"]:
+#                    column.append(token["lemma"])
+#                else:
+#                    column.append("-")
+#            else:
+#                column.append("-")
+            column.append("-")
             # Column  8: Predicate Frameset ID
             # TODO: figure out what Frameset ID is
             column.append("-")
@@ -298,10 +300,11 @@ def convert(doc_json, fo, nomention=False):
             # TODO: figure out what Word sense is
             column.append("-")
             # Column 10: Speaker / Author
-            if token["speaker"]:
-                column.append(token["speaker"])
-            else:
-                column.append("-")
+#            if token["speaker"]:
+#                column.append(token["speaker"])
+#            else:
+#                column.append("-")
+            column.append("-")
             # Column 11: Named Entities
             if token["ner"] == "O":
                 column.append("*")
@@ -309,7 +312,6 @@ def convert(doc_json, fo, nomention=False):
                 column.append(token["ner"])
             # Column 12: N Predicate Arguments
             #            N Coreference
-            column.append('*')
 
             if nomention:
                 column.append('-')
