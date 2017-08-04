@@ -309,6 +309,8 @@ def convert(doc_json, fo, nomention=False):
                 column.append(token["ner"])
             # Column 12: N Predicate Arguments
             #            N Coreference
+            column.append('*')
+
             if nomention:
                 column.append('-')
             else:
